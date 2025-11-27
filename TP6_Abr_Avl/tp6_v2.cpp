@@ -9,8 +9,8 @@ using Tab = std::array<int, N1>;
 struct noeud {
     int val;
     int hauteur=-1;
-    noeud * sag;
-    noeud * sad;
+    noeud * sag;  //sous arbre gauche
+    noeud * sad;  //sous arbre droite
 };
 using abr = noeud *;
 
@@ -196,6 +196,17 @@ bool est_equilibre(abr a) {
 }
 
 
+//QUESTION 10
+void liberer(abr & arbre) {
+    if (arbre != nullptr) {
+        liberer(arbre->sag);
+        liberer(arbre->sad);
+        std::cout << arbre->val << std::endl;
+        delete arbre;
+    };
+}
+
+
 //QUESTION 11
 void maj_hauteur_noeud(abr & arbre) {
     arbre->hauteur = hauteur(arbre);
@@ -210,7 +221,32 @@ void maj_hauteur_abr(abr & arbre) {
     std::cout << "Mise a jour des hauteurs terminée." << std::endl;
 }
 
+//QUESTION 12
+void rotation_droite(abr & arbre) {
+    abr arbre_temp = arbre->sag;
+    arbre->sag = arbre_temp->sad;
+    arbre_temp->sad = arbre;
+    arbre = arbre_temp;
+    maj_hauteur_abr(arbre);
+}
 
+void rotation_gauche(abr & arbre) {
+    abr arbre_temp = arbre->sad;
+    arbre->sad = arbre_temp->sag;
+    arbre_temp->sad = arbre;
+    arbre = arbre_temp;
+    maj_hauteur_abr(arbre);
+}
+
+void rotation_gauche_droite(abr & arbre) {
+    rotation_gauche(arbre->sag);
+    rotation_droite(arbre);
+}
+
+void rotation_droite_gauche(abr & arbre) {
+    rotation_droite(arbre->sad);
+    rotation_gauche(arbre);
+}
 
 
 
@@ -239,10 +275,14 @@ int main() {
     /* Question 7
     std::cout << "Somme total des valeurs inf ou egales a 5 : " << somme_inf(arbre1, 5) << std::endl;
     */
-    std::cout << "Equilibre ?" << std::boolalpha << est_equilibre(arbre3)  << std::endl;
+    //std::cout << "Equilibre ?" << std::boolalpha << est_equilibre(arbre3)  << std::endl;
     /*
     fusionner(arbre1, tab2, 10);
     */
+
+    //QUESTION 12
+    rotation_droite(arbre1);
+    affichage_infixe(arbre1);
     
     return 0;
 }
