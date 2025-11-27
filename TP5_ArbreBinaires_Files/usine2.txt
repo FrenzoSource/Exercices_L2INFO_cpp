@@ -1,0 +1,10 @@
+9 4
+magasin_1 0 0
+depot_A 1 3
+magasin_2 0 0
+usine 2 8
+magasin_3 0 0
+depot_C 5 7
+magasin_4 0 0
+depot_B 6 9
+magasin_5 0 0
