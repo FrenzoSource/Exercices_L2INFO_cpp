@@ -154,10 +154,9 @@ abr supprimer(abr a, int e) {
 
 int somme_inf(abr arbre, int elt) {
     if (arbre == nullptr) return 0;
-    if (arbre->val > elt) return 0 + somme_inf(arbre->sag, elt);
-    else  return arbre->val + somme_inf(arbre->sag, elt) + somme_inf(arbre->sad, elt);
+    if (arbre->val > elt) return somme_inf(arbre->sag, elt);
+    return arbre->val + somme_inf(arbre->sag, elt) + somme_inf(arbre->sad, elt);
 
-    return 0;
 }
 
 
@@ -247,6 +246,62 @@ void rotation_droite_gauche(abr & arbre) {
     rotation_droite(arbre->sad);
     rotation_gauche(arbre);
 }
+
+
+//QUESTION 13
+void reequilibrage(abr & arbre) {
+    if (arbre != nullptr) {
+        int facteur_equilibrage = hauteur(arbre->sad) - hauteur(arbre->sag);
+
+        if ((facteur_equilibrage == -2) || (facteur_equilibrage == 2)) {    //Abr non equilibré
+            if (facteur_equilibrage == -2) {
+                if ((hauteur(arbre->sag->sad) - hauteur(arbre->sag->sag) == 0) || (hauteur(arbre->sag->sad) - hauteur(arbre->sag->sag) == -1)) { //factueur equilibrage du ss arbre gauche
+                    rotation_droite(arbre->sag->sad);
+                }
+                else rotation_gauche_droite(arbre->sag->sag);
+            }
+
+            else if (facteur_equilibrage == 2) {
+                if ((hauteur(arbre->sad->sad) - hauteur(arbre->sad->sag) == 0) || (hauteur(arbre->sad->sad) - hauteur(arbre->sad->sag) == +1)) { //factueur equilibrage du ss arbre droit
+                    rotation_gauche(arbre->sad->sag);
+                }
+                else rotation_droite_gauche(arbre->sad->sad);
+            }
+            else maj_hauteur_noeud(arbre);
+        };
+    }; 
+}
+
+
+//QUESTION 14
+void ajouterAVL(abr & arbre, int elt) {
+    if (arbre == nullptr) {
+        arbre = new noeud;
+        arbre->val = elt;
+        arbre->sag == nullptr;
+        arbre->sad = nullptr;
+    }
+    else if (elt <= arbre->val) {
+        ajouterAVL(arbre->sag, elt);
+        reequilibrage(arbre);
+    }
+    else {
+        ajouter(arbre->sad, elt);
+        reequilibrage(arbre);
+    };
+}
+
+
+//QUESTION 15
+abr genererAVL(Tab tab, int taille_tab){
+    abr arbre = nullptr;
+    for (int i = 0; i < N1; ++i) {
+        ajouter(arbre, tab[i]);
+        reequilibrage(arbre);
+    };
+    return arbre;
+}
+
 
 
 
