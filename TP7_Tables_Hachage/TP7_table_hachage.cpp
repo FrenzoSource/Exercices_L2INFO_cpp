@@ -21,7 +21,8 @@ struct tableHachage {
 tableHachage init_table(int taille) {
     tableHachage table;
     table.m = taille;
-    table.pos_libre = (taille * 1.15) - 1;
+    table.pos_libre = taille + (taille/100) * 15;
+
     table.T = new occMot [table.pos_libre];
     //initialisation des alvéoles occmots
     for (int i = 0; i < table.pos_libre; ++i) {
@@ -43,12 +44,18 @@ int hachageBernstein(std::string mot, int m) {    //m est le facteur de compress
 
 //QUESTION 4
 void ajout(tableHachage & table, std::string mot) {
-    int i = hachageBernstein(mot, table.pos_libre);
+    int i = hachageBernstein(mot, table.m);
     if (table.T[i].occupe) {    // la case contient deja un mot
         if (table.T[i].mot == mot) ++table.T[i].occurences;
-        else {     // le mot est different de celui de la case
-            while (table.T[i].suiv >= 0) {
-                i = table.T[i].suiv;
+        else {     // le mot est different de celui de la première case
+            while (table.T[i].suiv >= 0 && table.T[i].mot != mot) {
+                //on doit verifier le cas ou si on croise le meme mot dans la case parcourut de notre tableau
+                if (table.T[i].mot == mot)  {
+                    ++table.T[i].occurences;
+                    while (table.pos_libre >= 0 && table.T[table.pos_libre].occupe) --table.pos_libre;
+                    return;
+                }
+                else i = table.T[i].suiv;
             };
             table.T[i].suiv = table.pos_libre;
             i = table.pos_libre;
@@ -72,6 +79,9 @@ void affichage(tableHachage table) {
     for (int i = 0; i < table.pos_libre; ++i) {
         std::cout << "mot indice " << i << ":" << table.T[i].mot << "  occurences:"<< table.T[i].occurences << std::endl;
     };
+    std::cout << "Facteur de remplissage de la zone primaire : " << table.m << std::endl;
+    std::cout << "Facteur de remplissage de la zone de reserve : 15%" << std::endl; 
+    std::cout << "Facteur de remplissage total (zone primaire + zone total) : " << table.m + (table.m / 100) * 15 << std::endl;
 }
 
 
@@ -83,38 +93,49 @@ void ajout_fichier(std::string fic, tableHachage & table) {
         std::cout << "Ouverture du fichier réussit." << std::endl;
         std::string mot;
         var_flux >> mot;
+        ajout(table, mot);
         while (var_flux.good()) {
-            ajout(table, mot);
             var_flux >> mot;
+            ajout(table, mot);
         };
     }
     else std::cout << "Echec de l'ouverture du fchier de données." << std::endl;
 }
 
 
+//QUESTION 6
+int occurence_mot(tableHachage & table, std::string mot) {
+    /*Ici on recalcule la taille max de notre tableau car pos_libre que l'on utiliser pour la derniere case de libre de notrre tableau est modifié lors de l'ajout (voire derniere ligne question4) de valeur dans table de hachage*/
+    int taille_tab = table.m + (table.m / 100) * 15;      // rappel: la taille est table.m
+    for (int i = 0; i < taille_tab; ++i) {
+        if (table.T[i].mot == mot) return table.T[i].occurences;
+    };
+    return 0;
+}
+
+
+
+
 
 
 int main() {
     std::string fichier_data = "bouledesuif.txt";
-    int zone_primaire;    // zone primaire est la taile de notre table sans la réserve
+    std::string fic_data2 = "test.txt";
+    int zone_primaire;    // zone primaire est la taille de notre table sans la réserve
     std::cout << "Saisir la taille de la zone primaire de la table de hachage : ";
     std::cin >> zone_primaire;
+
     tableHachage table = init_table(zone_primaire);
 
-    /*     patie test pour question 4
-    std::cout << "hachage de bernstein pour mot = hello: " << hachageBernstein("hello", table.pos_libre) << std::endl;
-    std::cout << "hachage de bernstein pour mot = holla: " << hachageBernstein("holla", table.pos_libre) << std::endl;
-    std::cout << "hachage de bernstein pour mot = bonjour: " << hachageBernstein("bonjour", table.pos_libre) << std::endl;
-    ajout(table, "hello");
-    ajout(table, "hello");
-    ajout(table, "holla");
-    ajout(table, "bonjour");
-    */
-    
-    
 
     ajout_fichier(fichier_data, table);
     affichage(table);
+
+    std::string mot_rec;
+    std::cout << "Saisir un mot a rechercher dans la table de hachage : ";
+    std::cin >> mot_rec;
+    std::cout << std::endl;
+    std::cout << "Le mot " << mot_rec << " apparrait " << occurence_mot(table, mot_rec) << " fois." << std::endl;
 
 
     return 0;
