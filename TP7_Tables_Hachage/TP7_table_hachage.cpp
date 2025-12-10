@@ -73,16 +73,6 @@ void ajout(tableHachage & table, std::string mot) {
 }
 
 
-//suplement
-void affichage(tableHachage table) {
-    std::cout << "Affichage des mots de notre table de hachage : " << std::endl;
-    for (int i = 0; i < table.pos_libre; ++i) {
-        std::cout << "mot indice " << i << ":" << table.T[i].mot << "  occurences:"<< table.T[i].occurences << std::endl;
-    };
-    std::cout << "Facteur de remplissage de la zone primaire : " << table.m << std::endl;
-    std::cout << "Facteur de remplissage de la zone de reserve : 15%" << std::endl; 
-    std::cout << "Facteur de remplissage total (zone primaire + zone total) : " << table.m + (table.m / 100) * 15 << std::endl;
-}
 
 
 //QUESTION 5
@@ -115,6 +105,16 @@ int occurence_mot(tableHachage & table, std::string mot) {
 
 
 
+//QUESTION 7
+void affichage(tableHachage table) {
+    std::cout << "Affichage des mots de notre table de hachage : " << std::endl;
+    for (int i = 0; i < table.pos_libre; ++i) {
+        std::cout << "mot indice " << i << ":" << table.T[i].mot << "  occurences:"<< table.T[i].occurences << std::endl;
+    };
+    std::cout << "Facteur de remplissage de la zone primaire : " << table.m << std::endl;
+    std::cout << "Facteur de remplissage de la zone de reserve : 15%" << std::endl; 
+    std::cout << "Facteur de remplissage total (zone primaire + zone total) : " << table.m + (table.m / 100) * 15 << std::endl;
+}
 
 
 
@@ -122,7 +122,7 @@ int main() {
     std::string fichier_data = "bouledesuif.txt";
     std::string fic_data2 = "test.txt";
     int zone_primaire;    // zone primaire est la taille de notre table sans la réserve
-    std::cout << "Saisir la taille de la zone primaire de la table de hachage : ";
+    std::cout << "Saisir la taille de la zone primaire de la table de hachage : ";   //exemple tester avec 50000000, 1000000, 20000, 5000
     std::cin >> zone_primaire;
 
     tableHachage table = init_table(zone_primaire);
